@@ -48,30 +48,34 @@ One-line policy:
 
 ## Install This Skill
 
-Replace `<this-skill-repo-url>` with the actual GitHub URL of this repository.
+Repository URL:
+
+```text
+https://github.com/AGI-is-going-to-arrive/memory-palace-setup.git
+```
 
 ### Claude Code
 
 ```bash
-git clone <this-skill-repo-url> ~/.claude/skills/memory-palace-setup
+git clone https://github.com/AGI-is-going-to-arrive/memory-palace-setup.git ~/.claude/skills/memory-palace-setup
 ```
 
 ### Codex CLI
 
 ```bash
-git clone <this-skill-repo-url> ~/.codex/skills/memory-palace-setup
+git clone https://github.com/AGI-is-going-to-arrive/memory-palace-setup.git ~/.codex/skills/memory-palace-setup
 ```
 
 ### Gemini CLI
 
 ```bash
-git clone <this-skill-repo-url> ~/.gemini/skills/memory-palace-setup
+git clone https://github.com/AGI-is-going-to-arrive/memory-palace-setup.git ~/.gemini/skills/memory-palace-setup
 ```
 
 ### Cursor
 
 ```bash
-git clone <this-skill-repo-url> ~/.cursor/skills/memory-palace-setup
+git clone https://github.com/AGI-is-going-to-arrive/memory-palace-setup.git ~/.cursor/skills/memory-palace-setup
 ```
 
 ### Antigravity
@@ -79,7 +83,7 @@ git clone <this-skill-repo-url> ~/.cursor/skills/memory-palace-setup
 Preferred path: clone the full skill repo into Antigravity's skills directory:
 
 ```bash
-git clone <this-skill-repo-url> ~/.gemini/antigravity/skills/memory-palace-setup
+git clone https://github.com/AGI-is-going-to-arrive/memory-palace-setup.git ~/.gemini/antigravity/skills/memory-palace-setup
 ```
 
 If your Antigravity setup prefers workflow projection, also copy the optional workflow file:

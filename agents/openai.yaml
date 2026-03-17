@@ -1,0 +1,4 @@
+interface:
+  display_name: "Memory Palace Setup"
+  short_description: "Guide Memory Palace setup step by step"
+  default_prompt: "Use $memory-palace-setup to install and configure the Memory Palace project step by step, prioritizing the skills + MCP path over MCP-only."

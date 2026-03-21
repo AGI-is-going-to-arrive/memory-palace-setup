@@ -97,11 +97,9 @@ the repo first.
   the POSIX wrapper path.
 - Do not tell the user to copy Docker `/app/...` or `/data/...` paths into a
   host `.env`.
-- For `Cursor`, `Antigravity`, and `VSCode-host`, prefer an automatic local config write when
+- For `Cursor`, `Antigravity`, `VSCode-host`, and `Windsurf`, prefer an automatic local config write when
   the host CLI or config surface is known; otherwise fall back to rendered
   snippet + manual paste.
-- For `Windsurf`, stay conservative unless the local machine proves a stable
-  host CLI path.
 
 ## Repo-Visible Sources To Prefer
 
@@ -131,7 +129,7 @@ When the main `Memory-Palace` repo is present, prefer these paths:
   `references/common-failures.md`.
 - For automatic IDE-host MCP config, read `references/host-matrix.md` first and
   prefer `scripts/apply_ide_mcp.py` when the host is `Cursor`,
-  `Antigravity`, or `VSCode-host`.
+  `Antigravity`, `VSCode-host`, or `Windsurf`.
 - If the user is looking at Dashboard first-run setup UI or screenshots, read
   `references/ui-setup-assistant.md`.
 
@@ -158,7 +156,7 @@ When the main `Memory-Palace` repo is present, prefer these paths:
 - Do not assume “the service is running” means “the client is connected.”
 - Do not present hidden skill mirrors as the default entry path for IDE hosts.
 - For IDE hosts, route to repo-local `AGENTS.md + render_ide_host_config.py`.
-- For `Cursor`, `Antigravity`, and `VSCode-host`, prefer automatic MCP config
+- For `Cursor`, `Antigravity`, `VSCode-host`, and `Windsurf`, prefer automatic MCP config
   before asking the user to paste JSON manually.
 - If the host CLI claims success, still verify the actual config file changed.
 - For CLI clients, prefer **user-scope first**.

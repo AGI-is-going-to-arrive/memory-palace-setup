@@ -93,12 +93,26 @@ python scripts/render_ide_host_config.py --host cursor
 
 ### Windsurf
 
-- route: repo-local `AGENTS.md + MCP snippet`
-- command:
+- route: repo-local `AGENTS.md + MCP`
+- preferred automation:
+
+```bash
+python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host windsurf --repo /path/to/local/Memory-Palace-checkout
+python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host windsurf --repo /path/to/local/Memory-Palace-checkout --check
+```
+
+- fallback render command:
 
 ```bash
 python scripts/render_ide_host_config.py --host windsurf
 ```
+
+- actual config surface on current macOS path:
+  - `~/Library/Application Support/Windsurf/User/mcp.json`
+- important boundary:
+  - verify the local Windsurf CLI really supports `--add-mcp`
+  - after automation, verify the actual host config file contains
+    `mcpServers.memory-palace`
 
 ### VSCode-host
 

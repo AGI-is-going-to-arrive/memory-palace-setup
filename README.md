@@ -16,9 +16,8 @@ Important warning:
 > IDE hosts still require the repo-local MCP snippet path.
 >
 > Current automation boundary:
-> `Cursor`, `Antigravity`, and `VSCode-host` can usually be auto-configured for MCP.
-> `Windsurf` should still default to the rendered snippet +
-> manual paste path unless the local machine proves a stable host CLI path.
+> `Cursor`, `Antigravity`, `VSCode-host`, and `Windsurf` can usually be
+> auto-configured for MCP when their local host CLI/config surface is available.
 
 ## Two Different Things
 
@@ -168,8 +167,7 @@ Current automation split:
 - `VSCode-host`
   - if the local VS Code MCP config surface is available, prefer automatic MCP config
 - `Windsurf`
-  - default to rendered snippet + manual paste unless a stable local host CLI is
-    confirmed on that machine
+  - if the local Windsurf MCP config surface is available, prefer automatic MCP config
 
 For the onboarding skill itself, the practical default is:
 
@@ -187,15 +185,18 @@ cp /path/to/memory-palace-setup/variants/antigravity/global_workflows/memory-pal
 
 If the user has already cloned
 `https://github.com/AGI-is-going-to-arrive/Memory-Palace` locally, the
-preferred automation path for `Cursor / Antigravity / VSCode-host` is:
+preferred automation path for `Cursor / Antigravity / VSCode-host / Windsurf`
+is:
 
 ```bash
 python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host cursor --repo /path/to/local/Memory-Palace-checkout
 python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host antigravity --repo /path/to/local/Memory-Palace-checkout
 python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host vscode --repo /path/to/local/Memory-Palace-checkout
+python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host windsurf --repo /path/to/local/Memory-Palace-checkout
 python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host cursor --repo /path/to/local/Memory-Palace-checkout --check
 python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host antigravity --repo /path/to/local/Memory-Palace-checkout --check
 python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host vscode --repo /path/to/local/Memory-Palace-checkout --check
+python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host windsurf --repo /path/to/local/Memory-Palace-checkout --check
 ```
 
 This script:

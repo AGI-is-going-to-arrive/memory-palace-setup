@@ -53,19 +53,20 @@ Use Memory Palace to create one temporary memory under notes://setup-smoke/<toda
 
 ### Minimal Pass
 
-1. for `Cursor / Antigravity / VSCode-host`, prefer automatic config first
+1. for `Cursor / Antigravity / VSCode-host / Windsurf`, prefer automatic config first
 
 ```bash
 python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host cursor --repo /path/to/local/Memory-Palace-checkout
 python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host antigravity --repo /path/to/local/Memory-Palace-checkout
 python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host vscode --repo /path/to/local/Memory-Palace-checkout
+python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host windsurf --repo /path/to/local/Memory-Palace-checkout
 python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host cursor --repo /path/to/local/Memory-Palace-checkout --check
 python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host antigravity --repo /path/to/local/Memory-Palace-checkout --check
 python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host vscode --repo /path/to/local/Memory-Palace-checkout --check
+python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host windsurf --repo /path/to/local/Memory-Palace-checkout --check
 ```
 
-2. for `Windsurf`, or when host automation is unavailable, render the repo-local
-   snippet
+2. when host automation is unavailable, render the repo-local snippet
 
 ```bash
 python scripts/render_ide_host_config.py --host cursor

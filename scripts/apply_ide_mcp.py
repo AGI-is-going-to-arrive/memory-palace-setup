@@ -10,7 +10,7 @@ from datetime import datetime
 from pathlib import Path
 
 
-AUTOMATED_HOSTS = ("cursor", "antigravity", "vscode")
+AUTOMATED_HOSTS = ("cursor", "antigravity", "vscode", "windsurf")
 LAUNCHERS = ("auto", "bash", "python-wrapper")
 
 
@@ -63,6 +63,12 @@ def target_config_path(host: str, home_dir: Path) -> Path:
         if os_name_is_windows():
             return home_dir / "AppData" / "Roaming" / "Code" / "User" / "mcp.json"
         return home_dir / ".config" / "Code" / "User" / "mcp.json"
+    if host == "windsurf":
+        if sys.platform == "darwin":
+            return home_dir / "Library" / "Application Support" / "Windsurf" / "User" / "mcp.json"
+        if os_name_is_windows():
+            return home_dir / "AppData" / "Roaming" / "Windsurf" / "User" / "mcp.json"
+        return home_dir / ".config" / "Windsurf" / "User" / "mcp.json"
     raise SystemExit(f"Unsupported host: {host}")
 
 

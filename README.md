@@ -1,52 +1,110 @@
 # Memory Palace Setup Skill
 
+Aligned with `Memory Palace v3.6.2`.
+
 This repository is not the `Memory-Palace` project itself.
 
-It is a dedicated **onboarding skill** for AI clients. Its job is simple:
+It is the **onboarding layer** for AI clients. Its job is to teach an AI how to
+route the user onto the correct installation path, instead of making the user
+jump between `README`, `GETTING_STARTED`, `IDE_HOSTS`, `install_skill.py`, and
+manual MCP configuration.
 
-> When a user says "use this skill to help me install and configure Memory Palace," the AI should enter the correct step-by-step setup flow immediately, instead of sending the user back and forth between `README`, `GETTING_STARTED`, skill docs, and MCP configuration.
+Important warning:
 
-The default position of this skill is:
+> For `Cursor / Windsurf / VSCode-host / Antigravity`, seeing the
+> `memory-palace` skill does **not** mean MCP is already installed.
+> IDE hosts still require the repo-local MCP snippet path.
+>
+> Current automation boundary:
+> `Cursor`, `Antigravity`, and `VSCode-host` can usually be auto-configured for MCP.
+> `Windsurf` should still default to the rendered snippet +
+> manual paste path unless the local machine proves a stable host CLI path.
 
-- **Install the skill first, then bind MCP**
-- **Prefer `skills + MCP`**
-- **Only fall back to `MCP-only` when the user explicitly wants remote `/sse`, Docker-only usage, or cannot install skills**
+## Two Different Things
 
-## What Problem This Solves
+This is the easiest place to get confused:
 
-This repository does not replace the real scripts and docs in the main `Memory-Palace` repo.
+- `memory-palace-setup`
+  - the onboarding skill in this repository
+  - its job is to guide installation and first-run troubleshooting
+- `memory-palace`
+  - the canonical skill shipped by the main `Memory-Palace` repository
+  - its job is to drive normal day-to-day durable-memory workflows after setup
 
-Instead, it teaches the AI to:
+One more distinction matters just as much:
 
-1. classify the user's setup goal first
-2. choose the correct client path
-3. give one step at a time
-4. explain what success should look like after each step
-5. stop early on common setup traps instead of continuing with bad assumptions
+- **service startup**
+  - `Dashboard / API / SSE` are running
+- **client integration**
+  - `Claude / Codex / Gemini / OpenCode / IDE host` can actually trigger and use
+    Memory Palace
 
-Typical trigger prompts:
+Those are different layers. A running service does not mean the client is
+already connected.
 
-- `Use $memory-palace-setup to install and configure Memory Palace step by step`
-- `Use this skill to help me install and configure the Memory Palace project`
-- `Help me connect Memory Palace to Claude Code / Codex / Gemini / Cursor / Antigravity`
-- `I do not want an MCP-only setup. Guide me through the full skills + MCP path`
+For IDE hosts, one more trap matters:
 
-## Profile Policy
+- seeing a skill or workflow entry is **not** proof that `memory-palace` MCP is
+  installed
+- the IDE host still needs `AGENTS.md + MCP snippet`
 
-When this skill helps users choose deployment profiles for the main `Memory-Palace` repo, it should always follow this policy:
+## Supported Hosts
 
-- **Profile B** is the default starting point
-  - it requires the fewest extra services
-  - it is the best path for getting the project running quickly
-- **Profile C / D** are the strongly recommended targets
-  - as soon as the user wants better retrieval quality, long-term usage, or real deployment, the AI should recommend upgrading to `C / D`
+CLI clients:
+
+- `Claude Code`
+- `Codex CLI`
+- `Gemini CLI`
+- `OpenCode`
+
+IDE hosts:
+
+- `Cursor`
+- `Windsurf`
+- `VSCode-host`
+- `Antigravity`
+
+## Default Recommendation
+
+- Prefer **skills + MCP** for normal day-to-day use.
+- Treat **MCP-only** as a fallback for explicit remote `/sse`, Docker-only, or
+  no-skill environments.
+- Start with **Profile B** when the user wants the fewest extra dependencies.
+- Recommend **Profile C** when local embedding / reranker services are ready.
+- Recommend **Profile D** when the user already plans to use remote APIs or a
+  hosted environment.
 
 One-line policy:
 
-> Start with **B** to get it running.  
-> As soon as model services are available, **strongly recommend** moving to **C / D**.
+> Start with `B` to get it running.  
+> Move to `C` when local retrieval services are available.  
+> Move to `D` when remote APIs or hosted deployment are already part of the
+> plan.
 
-## Install This Skill
+## Platform Boundary
+
+The main `Memory-Palace` repository now has two repo-local stdio launcher paths:
+
+- native Windows
+  - default repo-local wrapper: `backend/mcp_wrapper.py`
+- macOS / Linux / `WSL` / `Git Bash`
+  - default repo-local wrapper: `scripts/run_memory_palace_mcp_stdio.sh`
+
+Both wrappers expect:
+
+- the current checkout
+- the repo's local `.env`
+- the repo's local `backend/.venv`
+
+Important boundary:
+
+- do **not** copy Docker container paths like `/app/...` or `/data/...` into a
+  host-side `.env`
+- repo-local stdio wrappers will reject that configuration
+- if the user wants the containerized service instead, route them to Docker
+  `/sse`
+
+## Install This Onboarding Skill
 
 Repository URL:
 
@@ -54,119 +112,196 @@ Repository URL:
 https://github.com/AGI-is-going-to-arrive/memory-palace-setup.git
 ```
 
-### Claude Code
+### CLI Clients With Local Skill Directories
+
+#### Claude Code
 
 ```bash
-git clone https://github.com/AGI-is-going-to-arrive/memory-palace-setup.git ~/.claude/skills/memory-palace-setup
+git clone https://github.com/AGI-is-going-to-arrive/memory-palace-setup.git \
+  ~/.claude/skills/memory-palace-setup
 ```
 
-### Codex CLI
+#### Codex CLI
 
 ```bash
-git clone https://github.com/AGI-is-going-to-arrive/memory-palace-setup.git ~/.codex/skills/memory-palace-setup
+git clone https://github.com/AGI-is-going-to-arrive/memory-palace-setup.git \
+  ~/.codex/skills/memory-palace-setup
 ```
 
-### Gemini CLI
+#### Gemini CLI
 
 ```bash
-git clone https://github.com/AGI-is-going-to-arrive/memory-palace-setup.git ~/.gemini/skills/memory-palace-setup
+git clone https://github.com/AGI-is-going-to-arrive/memory-palace-setup.git \
+  ~/.gemini/skills/memory-palace-setup
 ```
 
-### Cursor
+#### OpenCode
 
 ```bash
-git clone https://github.com/AGI-is-going-to-arrive/memory-palace-setup.git ~/.cursor/skills/memory-palace-setup
+git clone https://github.com/AGI-is-going-to-arrive/memory-palace-setup.git \
+  ~/.opencode/skills/memory-palace-setup
 ```
 
-### Antigravity
+### IDE Hosts
 
-Preferred path: clone the full skill repo into Antigravity's skills directory:
+Do **not** lead with hidden skill mirrors for:
 
-```bash
-git clone https://github.com/AGI-is-going-to-arrive/memory-palace-setup.git ~/.gemini/antigravity/skills/memory-palace-setup
-```
+- `Cursor`
+- `Windsurf`
+- `VSCode-host`
+- `Antigravity`
 
-If your Antigravity setup prefers workflow projection, also copy the optional workflow file:
+For IDE hosts, the main project now uses:
+
+1. repo-local `AGENTS.md`
+2. `python scripts/render_ide_host_config.py --host ...`
+3. optional host-specific compatibility layers only when needed
+
+Current automation split:
+
+- `Cursor`
+  - if the host CLI/config surface is available, prefer automatic MCP config
+- `Antigravity`
+  - if the host CLI/config surface is available, prefer automatic MCP config
+  - also keep the workflow projection in sync
+- `VSCode-host`
+  - if the local VS Code MCP config surface is available, prefer automatic MCP config
+- `Windsurf`
+  - default to rendered snippet + manual paste unless a stable local host CLI is
+    confirmed on that machine
+
+For the onboarding skill itself, the practical default is:
+
+- let the current AI read this repository's `README.md` and `SKILL.md`
+- or open this repository locally in the host
+
+`Antigravity` still has an optional workflow projection path, but it is an
+extra layer, not the primary route:
 
 ```bash
 mkdir -p ~/.gemini/antigravity/global_workflows
-cp ~/.gemini/antigravity/skills/memory-palace-setup/variants/antigravity/global_workflows/memory-palace-setup.md \
+cp /path/to/memory-palace-setup/variants/antigravity/global_workflows/memory-palace-setup.md \
   ~/.gemini/antigravity/global_workflows/
 ```
 
+If the main `Memory-Palace` repo is already cloned locally, the preferred
+automation path for `Cursor / Antigravity / VSCode-host` is:
+
+```bash
+python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host cursor --repo /path/to/Memory-Palace
+python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host antigravity --repo /path/to/Memory-Palace
+python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host vscode --repo /path/to/Memory-Palace
+python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host cursor --repo /path/to/Memory-Palace --check
+python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host antigravity --repo /path/to/Memory-Palace --check
+python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host vscode --repo /path/to/Memory-Palace --check
+```
+
+This script:
+
+- renders the canonical repo-local MCP snippet from the main repo
+- writes the actual local host config file
+- copies the canonical antigravity workflow when needed
+- supports `--dry-run`, `--check`, and `--home` for testing
+
 ## How To Use It After Installation
 
-Once the skill is installed, say this in your AI client:
+Once the onboarding skill is installed, say one of these:
 
 ```text
-Use $memory-palace-setup to install and configure the Memory Palace project step by step.
+Use $memory-palace-setup to install and configure Memory Palace step by step.
+Prefer skills + MCP over MCP-only. Start with Profile B, but recommend C/D if the environment is ready.
 ```
-
-Or:
 
 ```text
-Use $memory-palace-setup to connect this project with the correct setup path. Prefer skills + MCP, not MCP-only.
+使用 $memory-palace-setup 帮我一步步安装配置 Memory Palace。
+优先走 skills + MCP，不要默认 MCP-only。先按 Profile B 起步，但如果环境允许，请主动推荐我升级到 C/D。
 ```
 
-The AI should then follow this flow:
+If the onboarding skill is not installed yet, the fallback prompt is:
 
-1. determine which path you actually need
-   - `Dashboard / API / SSE` only
-   - or full client integration for `Claude Code / Codex / Gemini / Cursor / Antigravity`
-2. default to `skills + MCP`
-3. choose the correct client-specific commands
-4. give one validation signal after each step
-5. stop and explain boundary conditions when prerequisites are missing
+```text
+Please read this repository's README.md and SKILL.md first, then guide me step by step to install and configure Memory Palace. Prefer skills + MCP over MCP-only.
+```
 
-## How The AI Should Guide Users
+## What The AI Should Do
 
-The default guidance policy is:
+The AI should:
 
-- **For supported clients, prefer `skills + MCP`**
-- **Do not confuse "the service is running" with "the client is connected"**
-- **Do not present `MCP-only` as the default path**
+1. separate the two objects first
+   - onboarding skill: `memory-palace-setup`
+   - canonical runtime skill: `memory-palace`
+2. identify the host
+   - CLI client
+   - IDE host
+   - service-only goal
+3. identify the platform boundary
+   - native Windows
+   - macOS / Linux
+   - `WSL` / `Git Bash`
+4. choose the smallest correct path
+   - full `skills + MCP`
+   - IDE-host `AGENTS.md + MCP snippet`
+   - service-only
+   - explicit `MCP-only` fallback
+5. prefer **user-scope first** for CLI clients
+   - `Claude / Codex / Gemini / OpenCode`
+6. mention workspace/project-level installs only when they are actually needed
+   - especially for `Claude` and `Gemini`
+7. validate with a real smoke chain, not just `mcp list`
 
-The AI should route users back to the real entry points in the main `Memory-Palace` repository:
+## Minimal Verification Chain
 
+The setup is not complete until the AI can show all of these:
+
+1. the correct skill layer is installed
+2. the client sees the `memory-palace` MCP entry
+3. the binding points to the current checkout
+4. the backend health check is reachable when service startup is involved
+5. the first real Memory Palace call succeeds
+   - minimum: `read_memory("system://boot")`
+6. optional but preferred:
+   - create one temporary smoke memory
+   - search for it once
+
+For the exact per-host checks, see:
+
+- `references/host-matrix.md`
+- `references/validation-matrix.md`
+
+## Dashboard Setup Assistant Boundary
+
+If the user is looking at the Dashboard first-run setup assistant:
+
+- the UI shows a **safe summary**, not the raw secret value
+- some fields may appear masked or visually faint
+- if the app is running in Docker, writing `.env` there can still be a
+  temporary convenience result
+- backend-side config changes still require a restart
+- this assistant helps local runtime configuration
+- it does **not** replace `skill discovery + MCP binding`
+
+So if the user wants real client integration, route back to the repo scripts and
+validation chain instead of treating the UI as proof that setup is finished.
+
+See `references/ui-setup-assistant.md`.
+
+## Repo-Visible Sources To Prefer
+
+When the main `Memory-Palace` repository is available locally, prefer these
+paths over paraphrasing:
+
+- `README.md`
+- `docs/README.md`
 - `docs/skills/SKILLS_QUICKSTART.md`
 - `docs/skills/GETTING_STARTED.md`
+- `docs/skills/CLI_COMPATIBILITY_GUIDE.md`
 - `docs/skills/IDE_HOSTS.md`
 - `docs/GHCR_QUICKSTART.md`
 - `scripts/sync_memory_palace_skill.py`
 - `scripts/install_skill.py`
 - `scripts/render_ide_host_config.py`
-
-That means this onboarding skill is a **router + guide**, not a replacement for the main repo scripts.
-
-When a user asks which deployment profile to use, the AI should say:
-
-- `B`: default starting profile, lowest external setup cost
-- `C`: strongly recommended whenever local model services are available
-- `D`: also a strongly recommended target for remote API or hosted environments
-
-## Why `MCP-only` Is Not The Default Recommendation
-
-For this project, a standalone MCP-only setup is usually weaker because:
-
-- the model may not know when to enter the Memory Palace workflow
-- users often miss the `skill discovery` layer
-- MCP configuration surfaces differ across clients
-- IDE hosts and CLI clients do not use the same primary path
-
-So the safer default answer is:
-
-> For normal day-to-day use of Memory Palace, install **both the skill and the MCP binding**.  
-> `MCP-only` should be treated as a fallback for explicit remote `/sse`, Docker-only, or no-skill environments.
-
-## Common Traps This Skill Should Catch
-
-- copying Docker `/app/...` paths into a local `.env`
-- installing the skill but forgetting MCP
-- configuring MCP but never enabling skill discovery
-- assuming successful `docker compose` means the client is already connected
-- copying `/bin/zsh` or `bash` examples directly into native Windows without `Git Bash` or `WSL`
-- forcing unstable workspace-local MCP expectations onto `Codex` or `OpenCode`
-- applying CLI hidden-mirror logic to `Cursor` or `Antigravity`
+- `scripts/run_memory_palace_mcp_stdio.sh`
+- `backend/mcp_wrapper.py`
 
 ## Repository Layout
 
@@ -176,10 +311,15 @@ memory-palace-setup/
 ├── SKILL.md
 ├── agents/
 │   └── openai.yaml
+├── scripts/
+│   └── apply_ide_mcp.py
 ├── references/
 │   ├── cli-routing.md
+│   ├── common-failures.md
+│   ├── host-matrix.md
 │   ├── service-modes.md
-│   └── common-failures.md
+│   ├── ui-setup-assistant.md
+│   └── validation-matrix.md
 └── variants/
     └── antigravity/
         └── global_workflows/
@@ -190,7 +330,7 @@ memory-palace-setup/
 
 This repository is only responsible for:
 
-- installation
+- installation routing
 - first-time connection
 - first-time configuration
 - first-time troubleshooting
@@ -199,6 +339,7 @@ It is not responsible for:
 
 - normal durable-memory operations
 - replacing the main `memory-palace` skill
-- editing code inside the main `Memory-Palace` repo
+- editing code inside the main `Memory-Palace` repository
 
-Once setup is complete, questions about `read_memory`, `search_memory`, `update_memory`, write guard behavior, or `rebuild_index` should switch back to the main `memory-palace` skill.
+Once setup is complete, normal use should switch to the canonical
+`memory-palace` skill from the main project.

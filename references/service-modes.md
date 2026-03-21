@@ -3,12 +3,15 @@
 Use this file when the user is unsure whether they need:
 
 - just the service
-- a full client integration
-- or a Docker `/sse` fallback
+- full `skills + MCP`
+- an IDE-host connection
+- or an `MCP-only` / Docker `/sse` fallback
 
-## Three different goals
+## Mode Selector
 
-### 1. Service only
+Choose one of these modes explicitly:
+
+### 1. Service Only
 
 Use this when the user only wants:
 
@@ -16,42 +19,66 @@ Use this when the user only wants:
 - `API`
 - `SSE`
 
-In that case, they can stop after local backend or Docker setup. Skill installation is not mandatory yet.
+In this mode, the user can stop after backend or Docker setup. Skill
+installation is not mandatory yet.
 
-Profile guidance for service startup:
-
-- Start with **Profile B** when the goal is to boot with the fewest extra requirements.
-- Strongly recommend **Profile C / D** once the user wants better retrieval quality or a more serious deployment target.
-
-### 2. Full daily-use client integration
+### 2. Full CLI Daily-Use Integration
 
 Use this when the user wants:
 
-- Claude Code, Codex CLI, Gemini CLI, Cursor, or Antigravity to actually use Memory Palace in normal conversations
+- `Claude Code`
+- `Codex CLI`
+- `Gemini CLI`
+- `OpenCode`
 
-This is the default recommended path for the project.
+to actually use Memory Palace in normal conversations.
 
-The answer should say clearly:
+This is the default recommendation for CLI users.
 
-> For normal use, prefer the repo’s **skills + MCP** path.  
-> Do not start with bare MCP unless you have a specific reason.
+### 3. IDE Host Integration
 
-If the user also asks about deployment profiles, say:
+Use this when the user wants:
 
-> **Profile B** is the default starting point because it needs the least extra setup.  
-> **Profile C / D** are the strongly recommended target profiles once model services are available.
+- `Cursor`
+- `Windsurf`
+- `VSCode-host`
+- `Antigravity`
 
-### 3. MCP-only or Docker `/sse`
+to use the current repo.
+
+The project path here is:
+
+- repo-local `AGENTS.md`
+- `python scripts/render_ide_host_config.py --host ...`
+
+### 4. MCP-Only Or Docker `/sse`
 
 Use this only when:
 
 - the user explicitly wants a remote client connected to Docker `/sse`
-- or the environment cannot install the repo’s skill layer
+- or the environment cannot install the repo's skill layer
 - or the user refuses local skill installation
 
-In that case, be explicit that the user is taking the fallback path.
+Be explicit that this is the fallback path.
 
-## Service-only quick path
+## Profile Selector
+
+When the user asks which deployment profile to start with:
+
+- **Profile B**
+  - use when the goal is to boot the project with the fewest extra
+    dependencies
+- **Profile C**
+  - use when local embedding / reranker services are already available or the
+    user wants stronger retrieval quality
+- **Profile D**
+  - use when remote APIs, hosted model services, or a hosted deployment target
+    are already part of the plan
+
+Do not present `B` as the best final state unless the user explicitly wants the
+lightest local boot only.
+
+## Local Service Quick Path
 
 If the user only wants the service, route them to the project docs for:
 
@@ -77,27 +104,74 @@ npm install
 npm run dev
 ```
 
-## Docker or GHCR boundary
+Minimal service health checks:
+
+```bash
+curl http://127.0.0.1:8000/health
+```
+
+Then verify:
+
+- backend health returns a payload
+- frontend opens on its dev URL
+
+## CLI Full-Integration Quick Path
+
+Inside the main repo:
+
+```bash
+python scripts/sync_memory_palace_skill.py
+python scripts/install_skill.py --targets claude,codex,gemini,opencode --scope user --with-mcp --force
+python scripts/install_skill.py --targets claude,codex,gemini,opencode --scope user --with-mcp --check
+```
+
+Optional workspace add-on for `Claude` / `Gemini` only:
+
+```bash
+python scripts/install_skill.py --targets claude,gemini --scope workspace --with-mcp --force
+```
+
+## IDE Host Quick Path
+
+Inside the main repo:
+
+```bash
+python scripts/render_ide_host_config.py --host cursor
+python scripts/render_ide_host_config.py --host windsurf
+python scripts/render_ide_host_config.py --host vscode
+python scripts/render_ide_host_config.py --host antigravity
+```
+
+If the host has `stdin/stdout` or `CRLF` quirks, switch to the wrapper form:
+
+```bash
+python scripts/render_ide_host_config.py --host antigravity --launcher python-wrapper
+```
+
+Important boundary:
+
+- IDE hosts do not use hidden skill mirrors as the default public route
+- the route is `AGENTS.md + MCP snippet`
+
+## Docker Or GHCR Boundary
 
 Explain this clearly:
 
 - Docker or GHCR gets the service running
-- it does **not** automatically configure the user’s local skill or MCP client
+- it does **not** automatically configure the user's local skill or MCP client
 
-So if the user later says “now connect Claude/Codex/Gemini to it”, switch back to the `skills + MCP` route.
+So if the user later says:
 
-## IDE host rule
+- “now connect Claude / Codex / Gemini / OpenCode”
+- or “now connect Cursor / Antigravity”
 
-For `Cursor` and `Antigravity`, the integration path for the project itself is:
+switch back to the CLI or IDE-host route immediately.
 
-- repo-local `AGENTS.md`
-- plus `python scripts/render_ide_host_config.py --host ...`
+## Exact Recommendation Language
 
-This setup skill repo only teaches the AI how to guide that process.
-
-## Exact recommendation language
-
-When a user asks “which mode should I use?”, default to:
+When the user asks “which mode should I use?”, default to:
 
 - `skills + MCP` for real day-to-day usage
-- `MCP-only` only for explicit remote `/sse`, Docker-only, or constrained environments
+- `AGENTS.md + MCP snippet` for IDE hosts
+- `MCP-only` only for explicit remote `/sse`, Docker-only, or constrained
+  environments

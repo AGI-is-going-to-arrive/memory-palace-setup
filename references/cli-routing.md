@@ -1,29 +1,60 @@
 # CLI Routing
 
-Use this file when the user wants to connect **Claude Code**, **Codex CLI**, or **Gemini CLI** to the **Memory Palace** project.
+Use this file when the user wants to connect a CLI client to the
+`Memory-Palace` project.
 
-## Core rule
+Supported CLI clients:
+
+- `Claude Code`
+- `Codex CLI`
+- `Gemini CLI`
+- `OpenCode`
+
+## Core Rule
 
 For supported CLI clients, prefer:
 
-1. install or sync the repo-local `memory-palace` skill
-2. bind MCP to the current repo
-3. validate
+1. sync the repo-local canonical `memory-palace` skill
+2. install the client binding with the repo script
+3. validate the MCP binding
+4. run one real smoke call
 
-Do **not** start with `MCP-only` unless the user explicitly wants Docker `/sse` only.
+Do **not** start with `MCP-only` unless the user explicitly wants Docker
+`/sse` only.
 
-## Explain the two layers first
+## Explain The Two Skill Layers First
 
-- **skill discovery**
-  - decides when the client should enter the Memory Palace workflow
-- **MCP binding**
-  - points the client to the real backend in the current repo
+- `memory-palace-setup`
+  - onboarding router
+- `memory-palace`
+  - canonical runtime skill from the main repo
 
-If either layer is missing, the setup is incomplete.
+If the user only installs the onboarding skill and never installs or syncs the
+main repo's canonical `memory-palace` skill, the final setup is still
+incomplete.
 
-## Fresh-machine default for CLI daily use
+## Cross-Platform Baseline
 
-Inside the Memory Palace repo:
+The install commands below are cross-platform because they call Python scripts
+from the main repo.
+
+Wrapper selection happens inside the main repo:
+
+- native Windows
+  - writes repo-local bindings that point to `backend/mcp_wrapper.py`
+- macOS / Linux / `WSL` / `Git Bash`
+  - writes repo-local bindings that point to
+    `scripts/run_memory_palace_mcp_stdio.sh`
+
+So on Windows:
+
+- prefer the installer-generated binding
+- do **not** manually transpose bash launcher examples unless the user is
+  explicitly using `WSL` or `Git Bash`
+
+## Fresh-Machine Default
+
+Inside the `Memory-Palace` repo:
 
 ```bash
 python scripts/sync_memory_palace_skill.py
@@ -33,11 +64,34 @@ python scripts/install_skill.py --targets claude,codex,gemini,opencode --scope u
 
 Why this default:
 
-- it installs the repo’s own `memory-palace` skill mirrors
-- it prefers the more stable user-scope MCP path on fresh machines
-- it is easier to explain than mixing workspace and user scopes too early
+- it installs the repo's canonical `memory-palace` skill mirrors
+- it uses the more stable **user-scope** MCP path on fresh machines
+- it keeps `Codex` and `OpenCode` on their recommended binding path
+- it lets `Claude` and `Gemini` work first, then add workspace entries only if
+  needed
 
-## Claude Code
+## Optional Workspace Add-On
+
+Only mention workspace/project-level entries when the user explicitly wants:
+
+- a visible repo-local project entry in the current checkout
+- or an extra project-level entry for `Claude Code` / `Gemini CLI`
+
+Then use:
+
+```bash
+python scripts/install_skill.py --targets claude,gemini --scope workspace --with-mcp --force
+python scripts/install_skill.py --targets claude,gemini --scope workspace --with-mcp --check
+```
+
+Do not oversell workspace scope as the stable default for:
+
+- `Codex`
+- `OpenCode`
+
+## Per-Client Guidance
+
+### Claude Code
 
 Recommended first move:
 
@@ -52,11 +106,12 @@ claude mcp list
 python scripts/install_skill.py --targets claude --scope user --with-mcp --check
 ```
 
-Optional:
+Optional add-on:
 
-- If the user also wants a project-level entry in the current repo, add a workspace install afterward.
+- add a workspace install afterward if the user also wants a project-level
+  entry in the repo
 
-## Codex CLI
+### Codex CLI
 
 Recommended first move:
 
@@ -73,10 +128,10 @@ python scripts/install_skill.py --targets codex --scope user --with-mcp --check
 
 Important boundary:
 
-- Do not oversell workspace-local MCP as the stable default for Codex in this project.
-- The stable message is: repo-local skill discovery plus **user-scope MCP binding**.
+- stable message: repo-local skill discovery plus **user-scope MCP binding**
+- do not present workspace-local MCP as the primary stable path
 
-## Gemini CLI
+### Gemini CLI
 
 Recommended first move:
 
@@ -94,27 +149,59 @@ python scripts/install_skill.py --targets gemini --scope user --with-mcp --check
 
 Important boundary:
 
-- Workspace-level Gemini entry can exist, but user-scope install is the more stable default on fresh machines.
+- user-scope is the more stable default on fresh machines
+- workspace install is optional, not the primary path
+- the installer also manages `memory-palace-overrides.toml`
 
-## When to mention workspace install
+### OpenCode
 
-Only mention workspace install when the user specifically wants:
-
-- the current repo to contain a visible project-level entry
-- or an additional local mirror for Claude or Gemini
-
-Then use:
+Recommended first move:
 
 ```bash
-python scripts/install_skill.py --targets claude,gemini --scope workspace --with-mcp --force
+python scripts/install_skill.py --targets opencode --scope user --with-mcp --force
 ```
 
-## What success looks like
+Useful checks:
+
+```bash
+opencode mcp list
+python scripts/install_skill.py --targets opencode --scope user --with-mcp --check
+```
+
+Important boundary:
+
+- do not describe OpenCode as “natively out-of-the-box”
+- accurate wording:
+  - the repo-local skill can be synced and installed
+  - the stable MCP path is still **user-scope**
+  - a real run can still depend on the user's provider credentials
+
+## Minimal CLI Validation Chain
+
+Do not call the setup complete before the user can verify:
+
+1. canonical skill synced
+2. selected client shows `memory-palace` in `mcp list`
+3. `install_skill.py --check` passes for the chosen scope
+4. the user asks the AI for one real Memory Palace call
+
+Suggested smoke prompt:
+
+```text
+Use Memory Palace to read system://boot. If that works, create one temporary memory under notes://setup-smoke/<today>/<client>, then search for "setup smoke".
+```
+
+If the user only wants the minimum check, stop after:
+
+```text
+Use Memory Palace to read system://boot and tell me whether the call succeeded.
+```
+
+## What Success Looks Like
 
 The user should end up with:
 
-- the repo’s canonical `memory-palace` skill under `docs/skills/memory-palace/`
-- client-local skill mirrors or user-scope skill installs
-- a client MCP entry pointing to the current repo’s `scripts/run_memory_palace_mcp_stdio.sh`
-
-Never describe the setup as complete before both skill discovery and MCP binding are checked.
+- the canonical `memory-palace` skill under `docs/skills/memory-palace/`
+- local skill mirrors or installed copies for the chosen CLI client
+- an MCP entry pointing to the current repo's launcher
+- one successful smoke call, not just a visible config item

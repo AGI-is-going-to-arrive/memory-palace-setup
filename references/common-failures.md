@@ -1,36 +1,56 @@
 # Common Failures
 
-Use this file when the user is already following setup steps but the result still does not work.
+Use this file when the user is already following setup steps but the result
+still does not work.
 
-## 1. “Docker is up, why can’t the client use Memory Palace?”
+## 1. The User Installed `memory-palace-setup`, But Not `memory-palace`
 
-Cause:
+Symptom:
 
-- The user started `Dashboard / API / SSE`
-- but never installed the repo’s skill layer or bound MCP for the client
-
-What to say:
-
-- Service startup and client integration are different layers.
-- If the user wants the client to use Memory Palace in normal conversations, move them to the `skills + MCP` path.
-
-## 2. Docker `/app/...` path copied into local `.env`
+- the onboarding skill is available
+- but the runtime workflow still does not trigger correctly
 
 Cause:
 
-- The user copied a container-internal path such as `/app/data/...` into the host-side `.env`
+- the user installed the router skill in this repo
+- but never synced or installed the main repo's canonical `memory-palace` skill
+
+Fix:
+
+- explain the two-skill distinction plainly
+- move the user to the main repo's `sync_memory_palace_skill.py` and
+  `install_skill.py` path
+
+## 2. “Docker Is Up, Why Can't The Client Use Memory Palace?”
+
+Cause:
+
+- the user started `Dashboard / API / SSE`
+- but never installed the runtime skill layer or bound MCP for the client
+
+Fix:
+
+- service startup and client integration are different layers
+- if the user wants normal AI conversations to use Memory Palace, move them to
+  the `skills + MCP` path
+
+## 3. Docker `/app/...` Or `/data/...` Path Copied Into Local `.env`
+
+Cause:
+
+- the user copied a container-internal SQLite path into the host-side `.env`
 
 Why it breaks:
 
 - repo-local stdio MCP runs on the host, not inside the container
 
-What to say:
+Fix:
 
-- Use a host absolute path in local `.env`
+- use a host absolute path in local `.env`
 - or keep using Docker `/sse`
 - do not mix the two
 
-## 3. Skill installed, but MCP not bound
+## 4. Skill Installed, But MCP Not Bound
 
 Symptom:
 
@@ -43,67 +63,134 @@ Cause:
 
 Fix:
 
-- run the repo’s `install_skill.py --with-mcp`
-- validate with the client’s `mcp list`
+- run the main repo's `install_skill.py --with-mcp`
+- validate with the client's `mcp list`
+- then run one real smoke call
 
-## 4. MCP bound, but skill not discovered
+## 5. MCP Bound, But Runtime Skill Not Synced
 
 Symptom:
 
-- tools exist
+- `mcp list` shows `memory-palace`
 - but the model does not reliably enter the Memory Palace workflow
 
 Cause:
 
 - only MCP was added
-- the repo skill was never synced or installed
+- the runtime skill mirrors were never synced or installed
 
 Fix:
 
-- sync or install the repo’s `memory-palace` skill first
+- sync or install the repo's canonical `memory-palace` skill first
 
-## 5. Native Windows shell mismatch
+## 6. `mcp list` Passes, But The First Tool Call Fails
 
 Symptom:
 
-- commands copied from docs fail around `bash` or `/bin/zsh`
+- config looks present
+- but `read_memory("system://boot")` fails or never executes
 
-Cause:
+Likely causes:
 
-- the repo-local wrapper examples assume `Git Bash` or `WSL`
+- wrong launcher path
+- wrong scope
+- stale user config
+- backend `.venv` missing
+- `.env` points to a Docker-only database path
 
 Fix:
 
-- tell the user this is a real runtime boundary, not a docs typo
-- ask them to use `Git Bash` or `WSL`
-- or switch to a path that does not require the local wrapper
+- re-run `install_skill.py --check`
+- verify the launcher path points to the current checkout
+- verify `backend/.venv` exists
+- then retry one smoke call
 
-## 6. Wrong scope expectation for Codex or similar clients
+## 7. Native Windows Confusion
 
 Symptom:
 
-- the user expects a workspace-local MCP entry to behave like the default stable path
+- the user assumes repo-local stdio requires `Git Bash` or `WSL`
+
+Correct explanation:
+
+- native Windows now has a real repo-local wrapper path:
+  - `backend/mcp_wrapper.py`
+- `Git Bash` / `WSL` are only needed when the user explicitly wants the POSIX
+  shell wrapper path
+
+Fix:
+
+- tell the user to trust the installer-generated binding on native Windows
+- do not ask them to manually copy bash launcher examples unless they chose
+  `WSL` or `Git Bash`
+
+## 8. Wrong Scope Expectation For Codex Or OpenCode
+
+Symptom:
+
+- the user expects workspace-local MCP to behave like the stable default
 
 Fix:
 
 - reset the explanation:
   - repo-local skill discovery is fine
-  - stable MCP binding should usually be user-scope first
+  - stable MCP binding should usually be **user-scope first**
 
-## 7. IDE host confusion
+## 9. IDE Host Confusion
 
 Symptom:
 
-- the user applies CLI hidden-mirror logic to `Cursor` or `Antigravity`
+- the user applies CLI hidden-mirror logic to `Cursor`, `Windsurf`,
+  `VSCode-host`, or `Antigravity`
 
 Fix:
 
-- say plainly that the project’s own integration path is:
+- say plainly that the project path is:
   - repo-local `AGENTS.md`
-  - rendered MCP snippet
-- do not lead with CLI-only mirror assumptions
+  - plus `python scripts/render_ide_host_config.py --host ...`
+- do not lead with hidden skill mirrors
 
-## 8. Missing local prerequisites
+## 10. IDE Host Snippet Was Rendered, But The Host Still Does Not See It
+
+Symptom:
+
+- `render_ide_host_config.py` produced a valid snippet
+- but the IDE host still cannot see `memory-palace`
+
+Likely causes:
+
+- snippet pasted into the wrong settings surface
+- host does not support local stdio MCP
+- host does not support workspace/project rules
+- `Antigravity` is reading legacy rules only
+
+Fix:
+
+- confirm the snippet was pasted into the host's local stdio MCP surface
+- confirm the repo-local rule file is in scope
+- for `Antigravity`, mention `AGENTS.md` first and `GEMINI.md` as legacy
+  fallback
+
+## 11. Dashboard Setup Assistant Looks Unclear
+
+Symptom:
+
+- the UI shows masked or faint values
+- the user cannot tell whether secrets or backend fields were really saved
+
+Correct explanation:
+
+- the setup assistant shows a safe summary and does not echo raw secret values
+- backend-side changes still require a restart
+- UI convenience does not prove skill discovery or client MCP binding
+
+Fix:
+
+- inspect the actual `.env` target and restart requirement
+- return to the script path for client integration
+- validate with `/health`, `install_skill.py --check`, and a real smoke call
+
+## 12. Missing Local Prerequisites
 
 Stop and say so when any of these are missing:
 

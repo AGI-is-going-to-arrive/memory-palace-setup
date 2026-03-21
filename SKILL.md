@@ -2,19 +2,18 @@
 name: memory-palace-setup
 description: >-
   Use this skill when the user wants to install, configure, connect, or
-  troubleshoot first-run setup for the Memory Palace project itself. Route
-  correctly for Claude Code, Codex CLI, Gemini CLI, OpenCode, Cursor,
-  Windsurf, VSCode-host, and Antigravity; distinguish the onboarding
-  `memory-palace-setup` skill from the main repo's canonical `memory-palace`
-  skill; prefer skills plus MCP over MCP-only; choose CLI user-scope installs
-  versus IDE-host AGENTS.md plus MCP snippet paths; handle native Windows via
-  `backend/mcp_wrapper.py` and POSIX hosts via
-  `scripts/run_memory_palace_mcp_stdio.sh`; inspect local facts before
-  suggesting commands; and guide the user step by step through validation and
-  common failures such as Docker `/app/...` paths, wrong scope, service-vs-
-  client confusion, or Dashboard setup-assistant ambiguity. Chinese trigger
-  hints: 安装配置这个项目, 首次接通, skills+mcp, mcp-only 太麻烦, 一步步引导,
-  Claude/Codex/Gemini/OpenCode/Cursor/Windsurf/VSCode/Antigravity.
+  troubleshoot first-run setup for the Memory Palace project itself. Distinguish
+  the onboarding `memory-palace-setup` skill from the main repo's canonical
+  `memory-palace` skill; prefer skills plus MCP over MCP-only; treat this setup
+  repo as temporary guidance that can be used by URL or direct doc reads
+  without persistent installation; prioritize the main repo's runtime
+  `memory-palace` skill when recommending something to install persistently;
+  keep the existing MCP logic unchanged; route Windows to
+  `backend/mcp_wrapper.py` and POSIX hosts to
+  `scripts/run_memory_palace_mcp_stdio.sh`; and guide setup for Claude Code,
+  Codex CLI, Gemini CLI, OpenCode, Cursor, Windsurf, VSCode-host, and
+  Antigravity. Chinese trigger hints: 安装配置这个项目, 首次接通, skills+mcp,
+  github地址, 仓库地址, 不安装也能看, 临时安装引导.
 ---
 
 # Memory Palace Setup
@@ -82,9 +81,34 @@ Before giving commands, determine these facts:
    - `scripts/sync_memory_palace_skill.py`
    - `scripts/install_skill.py`
    - `scripts/render_ide_host_config.py`
+5. What scope decision is actually being made?
+   - onboarding access
+     - default: repo URL or direct read of this repo's `README.md` and
+       `SKILL.md`
+     - persistent installation of `memory-palace-setup` is optional
+   - runtime skill visibility
+     - if something should be installed persistently, prioritize the main
+       repo's `memory-palace` skill
+   - MCP binding
+     - keep the current host-specific recommendation from the main repo
+     - do not silently change MCP scope just because the user asked about
+       onboarding access or runtime skill visibility
 
 If one concise question can disambiguate the path, ask it. Otherwise inspect
 the repo first.
+
+If the user is explicitly asking for the default cross-host scope policy, do
+not ask a host-selection follow-up first. Answer the default split directly:
+
+- onboarding access
+  - default to repo URL or direct doc reads
+- runtime skill visibility
+  - if something should be installed persistently, make that the main repo's
+    `memory-palace` skill
+  - if the user wants one stable cross-host installer, prefer
+    `scripts/apply_runtime_global_setup.py`
+- MCP binding
+  - keep the current host-specific logic unchanged
 
 ## Platform Rules
 
@@ -100,6 +124,13 @@ the repo first.
 - For `Cursor`, `Antigravity`, `VSCode-host`, and `Windsurf`, prefer an automatic local config write when
   the host CLI or config surface is known; otherwise fall back to rendered
   snippet + manual paste.
+- When the user chooses the global runtime path for IDE hosts, say explicitly:
+  - the runtime rule or skill layer is global
+  - the IDE MCP config is also user-level
+  - but that MCP entry still points to one selected local `Memory-Palace`
+    checkout
+  - if that checkout is moved, deleted, or broken, tool calls fail even though
+    the runtime rule layer still appears available
 
 ## Repo-Visible Sources To Prefer
 
@@ -130,6 +161,8 @@ When the main `Memory-Palace` repo is present, prefer these paths:
 - For automatic IDE-host MCP config, read `references/host-matrix.md` first and
   prefer `scripts/apply_ide_mcp.py` when the host is `Cursor`,
   `Antigravity`, `VSCode-host`, or `Windsurf`.
+- For persistent runtime `memory-palace` install or projection across hosts,
+  prefer `scripts/apply_runtime_global_setup.py`.
 - If the user is looking at Dashboard first-run setup UI or screenshots, read
   `references/ui-setup-assistant.md`.
 
@@ -142,26 +175,51 @@ When the main `Memory-Palace` repo is present, prefer these paths:
      `https://github.com/AGI-is-going-to-arrive/Memory-Palace`
    - only switch to a local checkout path when the next command truly needs one
 2. Diagnose the user's host, goal, platform, and scope.
-3. Recommend the smallest correct path.
-4. Prefer one copyable command block per step.
-5. After each step, tell the user what success should look like.
-6. Validate with the smallest relevant check before moving on.
-7. Do not stop at `mcp list`; require at least one real smoke call.
-8. If a prerequisite is missing, stop and say exactly what must be fixed first.
+3. Separate onboarding access from runtime skill visibility and MCP binding.
+4. Default the onboarding layer to repo URL or direct doc reads unless the user
+   explicitly wants to install `memory-palace-setup` as a persistent skill.
+   - if the user wants the runtime `memory-palace` layer available across
+     folders, prefer `scripts/apply_runtime_global_setup.py`
+5. Recommend the smallest correct path.
+6. Prefer one copyable command block per step.
+7. After each step, tell the user what success should look like.
+8. Validate with the smallest relevant check before moving on.
+9. Do not stop at `mcp list`; require at least one real smoke call.
+10. If a prerequisite is missing, stop and say exactly what must be fixed
+    first.
+
+When the user asks “global or repo-local by default?” across multiple hosts:
+
+- answer the cross-host default policy first
+- only ask a follow-up question afterward if the next command block depends on
+  the specific host
 
 ## Hard Rules
 
 - Do not recommend `MCP-only` as the primary path when the user wants normal
   daily use on a supported host.
 - Do not assume “the service is running” means “the client is connected.”
+- Do not collapse onboarding access, runtime skill visibility, and MCP binding
+  into one generic scope answer.
+- Do not dodge a direct cross-host default-scope question by immediately asking
+  “which host?” when the user is clearly asking for the default policy itself.
+- Do not default `memory-palace-setup` itself to persistent global installation.
+- If the user wants something installed persistently, prioritize the main repo's
+  runtime `memory-palace` skill instead.
+- If the user wants a stable setup-repo-managed command path for persistent
+  runtime install, prefer `scripts/apply_runtime_global_setup.py` before
+  spelling out lower-level host-specific script combinations.
+- If the user is using an IDE host with global runtime projection, do not hide
+  the selected-checkout caveat.
 - Do not present hidden skill mirrors as the default entry path for IDE hosts.
 - For IDE hosts, route to repo-local `AGENTS.md + render_ide_host_config.py`.
 - For `Cursor`, `Antigravity`, `VSCode-host`, and `Windsurf`, prefer automatic MCP config
   before asking the user to paste JSON manually.
 - If the host CLI claims success, still verify the actual config file changed.
-- For CLI clients, prefer **user-scope first**.
-- Only add workspace/project-level entries when they are actually needed,
-  especially for `Claude` and `Gemini`.
+- For CLI clients, keep the current MCP guidance unchanged:
+  - stable default remains **user-scope first**
+  - only add workspace/project-level entries when they are actually needed,
+    especially for `Claude` and `Gemini`
 - Treat `Codex` and `OpenCode` as **user-scope MCP first**.
 - Treat the Dashboard setup assistant as a convenience layer, not proof that
   the client integration is complete.
@@ -174,7 +232,9 @@ Your answer should usually contain:
   - current host
   - current platform
   - current mode
-  - current scope
+  - current onboarding access mode
+  - current runtime skill visibility scope
+  - current MCP scope
 - one step at a time
 - exact commands
 - one verification signal after each step
@@ -191,6 +251,7 @@ Do not dump every path at once unless the user asks for a comparison.
 - “我想让 Cursor / Windsurf / VSCode-host / Antigravity 接这个项目。”
 - “帮我判断我是该走 repo-local，还是 Docker `/sse`。”
 - “我只配了 MCP，但现在想补完整的 skill 安装。”
+- “默认到底该把什么全局安装？MCP 逻辑先别改。”
 
 ## Example Prompts That Should Not Trigger This Skill
 

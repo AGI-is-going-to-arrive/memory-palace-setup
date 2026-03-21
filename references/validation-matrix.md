@@ -13,17 +13,23 @@ https://github.com/AGI-is-going-to-arrive/Memory-Palace
 
 ### Minimal Pass
 
-1. sync the runtime skill
+1. install the runtime skill globally at user scope
+
+```bash
+python /path/to/memory-palace-setup/scripts/apply_runtime_global_setup.py --host claude --repo /path/to/local/Memory-Palace-checkout
+python /path/to/memory-palace-setup/scripts/apply_runtime_global_setup.py --host codex --repo /path/to/local/Memory-Palace-checkout
+python /path/to/memory-palace-setup/scripts/apply_runtime_global_setup.py --host gemini --repo /path/to/local/Memory-Palace-checkout
+python /path/to/memory-palace-setup/scripts/apply_runtime_global_setup.py --host opencode --repo /path/to/local/Memory-Palace-checkout
+python /path/to/memory-palace-setup/scripts/apply_runtime_global_setup.py --host claude --repo /path/to/local/Memory-Palace-checkout --check
+python /path/to/memory-palace-setup/scripts/apply_runtime_global_setup.py --host codex --repo /path/to/local/Memory-Palace-checkout --check
+python /path/to/memory-palace-setup/scripts/apply_runtime_global_setup.py --host gemini --repo /path/to/local/Memory-Palace-checkout --check
+python /path/to/memory-palace-setup/scripts/apply_runtime_global_setup.py --host opencode --repo /path/to/local/Memory-Palace-checkout --check
+```
+
+2. sync the runtime skill in the current repo only when the user also wants repo-local mirrors
 
 ```bash
 python scripts/sync_memory_palace_skill.py
-```
-
-2. install the CLI binding
-
-```bash
-python scripts/install_skill.py --targets claude,codex,gemini,opencode --scope user --with-mcp --force
-python scripts/install_skill.py --targets claude,codex,gemini,opencode --scope user --with-mcp --check
 ```
 
 3. confirm the client sees `memory-palace`
@@ -53,7 +59,20 @@ Use Memory Palace to create one temporary memory under notes://setup-smoke/<toda
 
 ### Minimal Pass
 
-1. for `Cursor / Antigravity / VSCode-host / Windsurf`, prefer automatic config first
+1. install or project the runtime layer globally first
+
+```bash
+python /path/to/memory-palace-setup/scripts/apply_runtime_global_setup.py --host cursor --repo /path/to/local/Memory-Palace-checkout
+python /path/to/memory-palace-setup/scripts/apply_runtime_global_setup.py --host antigravity --repo /path/to/local/Memory-Palace-checkout
+python /path/to/memory-palace-setup/scripts/apply_runtime_global_setup.py --host vscode --repo /path/to/local/Memory-Palace-checkout
+python /path/to/memory-palace-setup/scripts/apply_runtime_global_setup.py --host windsurf --repo /path/to/local/Memory-Palace-checkout
+python /path/to/memory-palace-setup/scripts/apply_runtime_global_setup.py --host cursor --repo /path/to/local/Memory-Palace-checkout --check
+python /path/to/memory-palace-setup/scripts/apply_runtime_global_setup.py --host antigravity --repo /path/to/local/Memory-Palace-checkout --check
+python /path/to/memory-palace-setup/scripts/apply_runtime_global_setup.py --host vscode --repo /path/to/local/Memory-Palace-checkout --check
+python /path/to/memory-palace-setup/scripts/apply_runtime_global_setup.py --host windsurf --repo /path/to/local/Memory-Palace-checkout --check
+```
+
+2. for `Cursor / Antigravity / VSCode-host / Windsurf`, keep automatic MCP config on the current checkout
 
 ```bash
 python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host cursor --repo /path/to/local/Memory-Palace-checkout
@@ -64,15 +83,6 @@ python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host cursor --rep
 python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host antigravity --repo /path/to/local/Memory-Palace-checkout --check
 python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host vscode --repo /path/to/local/Memory-Palace-checkout --check
 python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host windsurf --repo /path/to/local/Memory-Palace-checkout --check
-```
-
-2. when host automation is unavailable, render the repo-local snippet
-
-```bash
-python scripts/render_ide_host_config.py --host cursor
-python scripts/render_ide_host_config.py --host windsurf
-python scripts/render_ide_host_config.py --host vscode
-python scripts/render_ide_host_config.py --host antigravity
 ```
 
 3. confirm the host sees `memory-palace`
@@ -113,6 +123,20 @@ Confirm:
 
 - native Windows:
   - validate that the generated binding points to `backend/mcp_wrapper.py`
+- persistent runtime projection:
+  - validate that the expected user/global runtime surface exists for the
+    chosen host
+  - for `Cursor`, validate both the visible global skill path
+    `~/.cursor/skills-cursor/memory-palace/` and the compatibility projection
+    `~/.cursor/skills/memory-palace/`
+  - for `VSCode-host`, validate the visible global skill path
+    `~/.copilot/skills/memory-palace/`
+  - for `VSCode-host`, validate the visible custom agent path
+    `~/.copilot/agents/memory-palace.agent.md`
+  - for `Windsurf`, validate the visible global skill path
+    `~/.codeium/windsurf/skills/memory-palace/`
+  - for `OpenCode`, validate the visible global skill path
+    `~/.config/opencode/skills/memory-palace/`
 - macOS / Linux / `WSL` / `Git Bash`:
   - validate that the generated binding points to
     `scripts/run_memory_palace_mcp_stdio.sh`

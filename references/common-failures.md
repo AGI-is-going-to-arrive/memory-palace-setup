@@ -177,7 +177,37 @@ Fix:
 - for `Antigravity`, mention `AGENTS.md` first and `GEMINI.md` as legacy
   fallback
 
-## 11. Dashboard Setup Assistant Looks Unclear
+## 11. Global IDE Runtime Layer Exists, But Tool Calls Still Fail
+
+Symptom:
+
+- the IDE still shows `memory-palace` rules, instructions, or workflows
+- but actual tool calls fail after the user changed folders or after some time
+
+Likely cause:
+
+- the global runtime layer is still present at user scope
+- but the global MCP config still points at one selected local
+  `Memory-Palace` checkout
+- that checkout moved, was deleted, lost `.venv`, or has a broken `.env`
+
+Fix:
+
+- explain that “global runtime visibility” and “working tool calls” are not the
+  same thing
+- verify which local checkout the IDE MCP config currently points to
+- verify that the visible runtime surface still exists for the chosen host
+  - for `VSCode-host`, check `~/.copilot/skills/memory-palace/`
+  - for `VSCode-host`, check `~/.copilot/agents/memory-palace.agent.md`
+  - for `Windsurf`, check `~/.codeium/windsurf/skills/memory-palace/`
+- verify that checkout still has:
+  - `backend/mcp_wrapper.py`
+  - `backend/.venv`
+  - a host-correct `.env`
+- if the user wants another checkout to become the global target, rerun the
+  global runtime installer against that checkout
+
+## 12. Dashboard Setup Assistant Looks Unclear
 
 Symptom:
 
@@ -196,7 +226,7 @@ Fix:
 - return to the script path for client integration
 - validate with `/health`, `install_skill.py --check`, and a real smoke call
 
-## 12. Missing Local Prerequisites
+## 13. Missing Local Prerequisites
 
 Stop and say so when any of these are missing:
 

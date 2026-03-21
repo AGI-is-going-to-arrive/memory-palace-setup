@@ -131,6 +131,23 @@ python scripts/install_skill.py --targets claude,codex,gemini,opencode --scope u
 python scripts/install_skill.py --targets claude,codex,gemini,opencode --scope user --with-mcp --check
 ```
 
+This default already means:
+
+- the skill is installed globally at user scope
+- the MCP binding keeps the current stable user-scope-first logic
+
+Only add repo-local mirrors or workspace entries afterward when the user
+explicitly wants the current checkout to expose a local skill entry too.
+
+For a setup-repo-managed persistent runtime install, use:
+
+```bash
+python /path/to/memory-palace-setup/scripts/apply_runtime_global_setup.py --host claude --repo /path/to/local/Memory-Palace-checkout
+python /path/to/memory-palace-setup/scripts/apply_runtime_global_setup.py --host codex --repo /path/to/local/Memory-Palace-checkout
+python /path/to/memory-palace-setup/scripts/apply_runtime_global_setup.py --host gemini --repo /path/to/local/Memory-Palace-checkout
+python /path/to/memory-palace-setup/scripts/apply_runtime_global_setup.py --host opencode --repo /path/to/local/Memory-Palace-checkout
+```
+
 Optional workspace add-on for `Claude` / `Gemini` only:
 
 ```bash
@@ -158,6 +175,11 @@ Important boundary:
 
 - IDE hosts do not use hidden skill mirrors as the default public route
 - the route is `AGENTS.md + MCP snippet`
+- the onboarding setup repo itself does not need persistent installation;
+  giving the AI the setup repo URL is enough
+- if the user wants the runtime layer visible across folders, use
+  `scripts/apply_runtime_global_setup.py`, but keep MCP pointed at the current
+  repo
 
 ## Docker Or GHCR Boundary
 

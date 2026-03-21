@@ -1,4 +1,4 @@
 interface:
   display_name: "Memory Palace Setup"
   short_description: "Guide Memory Palace setup step by step"
-  default_prompt: "Use $memory-palace-setup to install and configure the Memory Palace project step by step, prioritizing the skills + MCP path over MCP-only."
+  default_prompt: "Use $memory-palace-setup to install and configure the Memory Palace project step by step. This onboarding repo can be used by URL or by reading this repo's README and SKILL without persistent installation. When recommending something to install persistently, prioritize the main repo's runtime memory-palace skill, prefer scripts/apply_runtime_global_setup.py as the setup-repo-managed cross-host installer when applicable, and keep the existing MCP logic unchanged."

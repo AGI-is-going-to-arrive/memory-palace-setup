@@ -31,6 +31,24 @@ For supported CLI clients, prefer:
 Do **not** start with `MCP-only` unless the user explicitly wants Docker
 `/sse` only.
 
+## Separate Skill Scope From MCP Scope
+
+Do not answer these as one combined “scope” choice.
+
+- onboarding setup access
+  - default recommendation: this setup repo URL or direct reads of this repo's
+    `README.md` and `SKILL.md`
+  - do not default `memory-palace-setup` itself to persistent installation
+- runtime skill visibility
+  - if the user wants something installed persistently, make that the main
+    repo's `memory-palace` skill
+  - repo-local or workspace skill entries are optional add-ons when the user
+    explicitly wants the current checkout to expose a local entry too
+- MCP binding
+  - keep the current stable per-client recommendation unchanged
+  - do not move MCP to workspace scope just because the user asked for a
+    repo-local runtime skill entry
+
 ## Explain The Two Skill Layers First
 
 - `memory-palace-setup`
@@ -73,13 +91,52 @@ python scripts/install_skill.py --targets claude,codex,gemini,opencode --scope u
 
 Why this default:
 
-- it installs the repo's canonical `memory-palace` skill mirrors
+- it gives the user/global skill install most people actually want on a fresh
+  machine
+- it still installs the repo's canonical `memory-palace` skill mirrors where
+  the main repo expects them
 - it uses the more stable **user-scope** MCP path on fresh machines
 - it keeps `Codex` and `OpenCode` on their recommended binding path
 - it lets `Claude` and `Gemini` work first, then add workspace entries only if
   needed
 
-## Optional Workspace Add-On
+If the user wants the setup repo to drive the persistent runtime install
+directly, use:
+
+```bash
+python /path/to/memory-palace-setup/scripts/apply_runtime_global_setup.py --host claude --repo /path/to/local/Memory-Palace-checkout
+python /path/to/memory-palace-setup/scripts/apply_runtime_global_setup.py --host codex --repo /path/to/local/Memory-Palace-checkout
+python /path/to/memory-palace-setup/scripts/apply_runtime_global_setup.py --host gemini --repo /path/to/local/Memory-Palace-checkout
+python /path/to/memory-palace-setup/scripts/apply_runtime_global_setup.py --host opencode --repo /path/to/local/Memory-Palace-checkout
+```
+
+This wrapper keeps the same user-scope-first MCP behavior; it just gives the
+setup repo one stable entry point for persistent runtime install.
+
+## Optional Repo-Local Skill Add-On
+
+Only mention repo-local or workspace add-ons when the user explicitly wants the
+current checkout to expose a local skill entry too.
+
+If the user wants a repo-local projection without changing the existing MCP
+logic, use:
+
+```bash
+python scripts/sync_memory_palace_skill.py
+python scripts/install_skill.py --targets claude,gemini --scope workspace --force
+```
+
+What this means:
+
+- `sync_memory_palace_skill.py`
+  - refreshes repo-local mirrors in the current checkout
+- `install_skill.py --scope workspace --force`
+  - adds repo-local skill entries for targets that support a stable workspace
+    skill surface
+- because `--with-mcp` is omitted here, this add-on does **not** change the
+  user's current MCP binding logic
+
+## Optional Workspace MCP Add-On
 
 Only mention workspace/project-level entries when the user explicitly wants:
 
@@ -105,6 +162,12 @@ Do not oversell workspace scope as the stable default for:
 Recommended first move:
 
 ```bash
+python /path/to/memory-palace-setup/scripts/apply_runtime_global_setup.py --host claude --repo /path/to/local/Memory-Palace-checkout
+```
+
+Equivalent main-repo command:
+
+```bash
 python scripts/install_skill.py --targets claude --scope user --with-mcp --force
 ```
 
@@ -118,11 +181,19 @@ python scripts/install_skill.py --targets claude --scope user --with-mcp --check
 Optional add-on:
 
 - add a workspace install afterward if the user also wants a project-level
-  entry in the repo
+  repo-local skill entry
+- only add `--with-mcp` on that workspace step when the user explicitly also
+  wants workspace MCP
 
 ### Codex CLI
 
 Recommended first move:
+
+```bash
+python /path/to/memory-palace-setup/scripts/apply_runtime_global_setup.py --host codex --repo /path/to/local/Memory-Palace-checkout
+```
+
+Equivalent main-repo command:
 
 ```bash
 python scripts/install_skill.py --targets codex --scope user --with-mcp --force
@@ -139,10 +210,19 @@ Important boundary:
 
 - stable message: repo-local skill discovery plus **user-scope MCP binding**
 - do not present workspace-local MCP as the primary stable path
+- if the user wants an extra repo-local skill projection in the current
+  checkout, use `sync_memory_palace_skill.py` as the add-on and leave MCP on
+  the user-scope route
 
 ### Gemini CLI
 
 Recommended first move:
+
+```bash
+python /path/to/memory-palace-setup/scripts/apply_runtime_global_setup.py --host gemini --repo /path/to/local/Memory-Palace-checkout
+```
+
+Equivalent main-repo command:
 
 ```bash
 python scripts/install_skill.py --targets gemini --scope user --with-mcp --force
@@ -161,10 +241,18 @@ Important boundary:
 - user-scope is the more stable default on fresh machines
 - workspace install is optional, not the primary path
 - the installer also manages `memory-palace-overrides.toml`
+- if the user only wants repo-local skill visibility as an add-on, a workspace
+  install without `--with-mcp` is enough; keep MCP on the existing stable route
 
 ### OpenCode
 
 Recommended first move:
+
+```bash
+python /path/to/memory-palace-setup/scripts/apply_runtime_global_setup.py --host opencode --repo /path/to/local/Memory-Palace-checkout
+```
+
+Equivalent main-repo command:
 
 ```bash
 python scripts/install_skill.py --targets opencode --scope user --with-mcp --force
@@ -184,6 +272,9 @@ Important boundary:
   - the repo-local skill can be synced and installed
   - the stable MCP path is still **user-scope**
   - a real run can still depend on the user's provider credentials
+- if the user wants an extra repo-local skill projection in the current
+  checkout, use `sync_memory_palace_skill.py` as the add-on and leave MCP on
+  the user-scope route
 
 ## Minimal CLI Validation Chain
 
@@ -211,6 +302,10 @@ Use Memory Palace to read system://boot and tell me whether the call succeeded.
 The user should end up with:
 
 - the canonical `memory-palace` skill under `docs/skills/memory-palace/`
-- local skill mirrors or installed copies for the chosen CLI client
+- a user/global skill install by default for the chosen CLI client
+- for `OpenCode`, a visible global skill under
+  `~/.config/opencode/skills/memory-palace/`
+- optional repo-local mirrors or workspace entries only when the user asked for
+  current-checkout visibility too
 - an MCP entry pointing to the current repo's launcher
 - one successful smoke call, not just a visible config item

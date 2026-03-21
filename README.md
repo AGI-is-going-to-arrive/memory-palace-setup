@@ -1,6 +1,6 @@
 # Memory Palace Setup Skill
 
-Aligned with `Memory Palace v3.6.2`.
+Aligned with `Memory Palace v3.6.3`.
 
 This repository is not the `Memory-Palace` project itself.
 
@@ -18,6 +18,9 @@ Important warning:
 > Current automation boundary:
 > `Cursor`, `Antigravity`, `VSCode-host`, and `Windsurf` can usually be
 > auto-configured for MCP when their local host CLI/config surface is available.
+> The runtime `memory-palace` layer can also be installed or projected globally
+> through user-level skill, rule, instruction, or workflow surfaces, while MCP
+> keeps pointing at the current checkout.
 
 ## Two Different Things
 
@@ -67,6 +70,20 @@ IDE hosts:
 ## Default Recommendation
 
 - Prefer **skills + MCP** for normal day-to-day use.
+- Separate **onboarding access**, **runtime skill visibility**, and **MCP binding**.
+- The onboarding repo `memory-palace-setup` itself does **not** need persistent
+  global installation by default.
+- The normal public path is:
+  - give the AI this GitHub repository URL
+  - or tell the AI to read this repository's `README.md` and `SKILL.md`
+- When recommending something to install persistently, prioritize the main
+  repo's runtime `memory-palace` skill instead of the temporary onboarding
+  `memory-palace-setup` skill.
+- For a one-command persistent runtime install or projection, use:
+  - `python scripts/apply_runtime_global_setup.py --host ... --repo /path/to/local/Memory-Palace-checkout`
+- Keep the current MCP logic unchanged:
+  - CLI clients still follow the existing stable user-scope-first MCP path where documented
+  - IDE hosts still point MCP at the current `Memory-Palace` checkout
 - Treat **MCP-only** as a fallback for explicit remote `/sse`, Docker-only, or
   no-skill environments.
 - Start with **Profile B** when the user wants the fewest extra dependencies.
@@ -80,6 +97,30 @@ One-line policy:
 > Move to `C` when local retrieval services are available.  
 > Move to `D` when remote APIs or hosted deployment are already part of the
 > plan.
+
+## Default Scope Answer
+
+If the user is not asking about one specific host yet and is instead asking for
+the default policy, answer directly instead of asking a follow-up question
+first.
+
+Use this exact stance:
+
+- onboarding access
+  - default: give the AI this setup repo URL or ask it to read this repo
+    directly
+  - do not present persistent installation of `memory-palace-setup` itself as
+    mandatory
+- runtime skill visibility
+  - if the user wants something installed persistently, prioritize the main
+    repo's `memory-palace` skill
+  - for a cross-host installer, use `scripts/apply_runtime_global_setup.py`
+- MCP binding
+  - keep the current host-specific logic unchanged
+  - CLI still follows the existing stable MCP recommendation per client
+  - IDE hosts still point MCP at the current `Memory-Palace` checkout
+
+Only move to a host-specific follow-up question after stating that default.
 
 ## Platform Boundary
 
@@ -104,7 +145,7 @@ Important boundary:
 - if the user wants the containerized service instead, route them to Docker
   `/sse`
 
-## Install This Onboarding Skill
+## Optional Onboarding Skill Install
 
 Repository URL:
 
@@ -112,7 +153,17 @@ Repository URL:
 https://github.com/AGI-is-going-to-arrive/memory-palace-setup.git
 ```
 
-### CLI Clients With Local Skill Directories
+Most users do **not** need to install `memory-palace-setup` persistently.
+
+The normal public path is simply:
+
+- send the AI this repository URL
+- or tell it to read this repository's `README.md` and `SKILL.md`
+
+Only use the following clone path when you explicitly want this onboarding layer
+available as a local skill for a specific client.
+
+### Optional CLI Local Skill Directories
 
 #### Claude Code
 
@@ -161,18 +212,26 @@ Current automation split:
 
 - `Cursor`
   - if the host CLI/config surface is available, prefer automatic MCP config
+  - for persistent runtime visibility, prefer a user-level visible skill
+    projection under `~/.cursor/skills-cursor/memory-palace/`
 - `Antigravity`
   - if the host CLI/config surface is available, prefer automatic MCP config
   - also keep the workflow projection in sync
+  - user-level workflow projection is a stable runtime surface
 - `VSCode-host`
   - if the local VS Code MCP config surface is available, prefer automatic MCP config
+  - for persistent runtime visibility, prefer a visible user-level custom agent
 - `Windsurf`
   - if the local Windsurf MCP config surface is available, prefer automatic MCP config
+  - for persistent runtime visibility, prefer a visible global skill under the
+    Windsurf user skill directory
 
-For the onboarding skill itself, the practical default is:
+For the onboarding layer itself, the practical default is:
 
 - let the current AI read this repository's `README.md` and `SKILL.md`
-- or open this repository locally in the host
+- or give the AI this repository URL directly
+- only install `memory-palace-setup` as a persistent client skill when the user
+  explicitly wants that extra convenience layer
 
 `Antigravity` still has an optional workflow projection path, but it is an
 extra layer, not the primary route:
@@ -206,6 +265,51 @@ This script:
 - copies the canonical antigravity workflow when needed
 - supports `--dry-run`, `--check`, and `--home` for testing
 
+If the user wants the runtime `memory-palace` layer visible globally across
+folders, use:
+
+```bash
+python /path/to/memory-palace-setup/scripts/apply_runtime_global_setup.py --host claude --repo /path/to/local/Memory-Palace-checkout
+python /path/to/memory-palace-setup/scripts/apply_runtime_global_setup.py --host codex --repo /path/to/local/Memory-Palace-checkout
+python /path/to/memory-palace-setup/scripts/apply_runtime_global_setup.py --host gemini --repo /path/to/local/Memory-Palace-checkout
+python /path/to/memory-palace-setup/scripts/apply_runtime_global_setup.py --host opencode --repo /path/to/local/Memory-Palace-checkout
+python /path/to/memory-palace-setup/scripts/apply_runtime_global_setup.py --host cursor --repo /path/to/local/Memory-Palace-checkout
+python /path/to/memory-palace-setup/scripts/apply_runtime_global_setup.py --host vscode --repo /path/to/local/Memory-Palace-checkout
+python /path/to/memory-palace-setup/scripts/apply_runtime_global_setup.py --host windsurf --repo /path/to/local/Memory-Palace-checkout
+python /path/to/memory-palace-setup/scripts/apply_runtime_global_setup.py --host antigravity --repo /path/to/local/Memory-Palace-checkout
+```
+
+This script:
+
+- installs the runtime `memory-palace` layer globally at user scope for CLI
+  hosts
+- projects the runtime layer globally for IDE hosts through host-native
+  skills, agents, workflows, or compatibility skill surfaces
+- for `Cursor`, also writes a visible global skill projection under
+  `~/.cursor/skills-cursor/memory-palace/`
+- for `VSCode-host`, writes a visible global skill under
+  `~/.copilot/skills/memory-palace/` and a custom agent under
+  `~/.copilot/agents/memory-palace.agent.md`
+- for `Windsurf`, writes a visible global skill under
+  `~/.codeium/windsurf/skills/memory-palace/`
+- for `OpenCode`, also writes a visible global skill under
+  `~/.config/opencode/skills/memory-palace/`
+- writes IDE MCP into the host's user-level config surface, but still points it
+  at one selected local `Memory-Palace` checkout
+- does **not** install `memory-palace-setup` persistently
+
+## IDE Global Runtime Caveat
+
+If the user chooses the global runtime path for IDE hosts, say this plainly:
+
+- the runtime rule or skill layer is global
+- the MCP config is also written at user scope
+- but that MCP entry still targets one selected local `Memory-Palace` checkout
+- if that checkout is moved, deleted, or its `.env` / `.venv` breaks, the IDE
+  can still see the runtime rule layer while tool calls fail
+- if the user has multiple `Memory-Palace` checkouts, they must pick which one
+  is the current global target
+
 ## How To Use It After Installation
 
 Once the onboarding skill is installed, say one of these:
@@ -228,6 +332,13 @@ If the onboarding skill is not installed yet, the fallback prompt is:
 Please read this repository's README.md and SKILL.md first, then guide me step by step to install and configure Memory Palace from https://github.com/AGI-is-going-to-arrive/Memory-Palace. Prefer skills + MCP over MCP-only.
 ```
 
+Or even shorter:
+
+```text
+Use this repo URL as the setup guide for installing Memory Palace:
+https://github.com/AGI-is-going-to-arrive/memory-palace-setup
+```
+
 ## What The AI Should Do
 
 The AI should:
@@ -243,16 +354,36 @@ The AI should:
    - native Windows
    - macOS / Linux
    - `WSL` / `Git Bash`
-4. choose the smallest correct path
+4. separate the scope decisions
+   - onboarding access
+     - default: repo URL or direct read of this repo's docs
+     - persistent install of `memory-palace-setup` is optional
+   - runtime skill visibility
+     - if something should be installed persistently, prioritize the main
+      repo's runtime `memory-palace` skill
+     - for a unified installer, prefer `scripts/apply_runtime_global_setup.py`
+   - MCP binding
+     - keep the current host-specific recommendation unchanged
+5. choose the smallest correct path
    - full `skills + MCP`
    - IDE-host `AGENTS.md + MCP snippet`
    - service-only
    - explicit `MCP-only` fallback
-5. prefer **user-scope first** for CLI clients
-   - `Claude / Codex / Gemini / OpenCode`
-6. mention workspace/project-level installs only when they are actually needed
+6. do not treat `memory-palace-setup` itself as the thing that must be installed
+   globally
+7. keep the current MCP logic unchanged
+   - CLI: follow the existing stable MCP recommendation per client
+   - IDE: keep MCP pointed at the current repo
+8. when recommending persistent installation, prioritize the runtime
+   `memory-palace` skill from the main repo
+9. mention repo-local/workspace add-ons only when they are actually needed
    - especially for `Claude` and `Gemini`
-7. validate with a real smoke chain, not just `mcp list`
+10. validate with a real smoke chain, not just `mcp list`
+
+If the user is explicitly asking for the default cross-host scope policy:
+
+- answer the default scope split first
+- do not stop and ask “which host?” before giving that default
 
 ## Minimal Verification Chain
 
@@ -317,6 +448,7 @@ memory-palace-setup/
 ├── agents/
 │   └── openai.yaml
 ├── scripts/
+│   ├── apply_runtime_global_setup.py
 │   └── apply_ide_mcp.py
 ├── references/
 │   ├── cli-routing.md
@@ -329,6 +461,12 @@ memory-palace-setup/
     └── antigravity/
         └── global_workflows/
             └── memory-palace-setup.md
+    ├── vscode/
+    │   └── agents/
+    │       └── memory-palace.agent.md
+    └── windsurf/
+        └── skills/
+            └── memory-palace/
 ```
 
 ## Scope Boundary

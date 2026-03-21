@@ -7,6 +7,12 @@ Use this file when the user is unsure whether they need:
 - an IDE-host connection
 - or an `MCP-only` / Docker `/sse` fallback
 
+Target project repo:
+
+```text
+https://github.com/AGI-is-going-to-arrive/Memory-Palace
+```
+
 ## Mode Selector
 
 Choose one of these modes explicitly:

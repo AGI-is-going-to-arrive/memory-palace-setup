@@ -31,6 +31,7 @@ Explain this immediately when the user is confused:
   - the onboarding skill in this repository
 - `memory-palace`
   - the canonical runtime skill shipped by the main `Memory-Palace` repository
+  - target repo: `https://github.com/AGI-is-going-to-arrive/Memory-Palace`
 
 Also explain:
 
@@ -139,6 +140,9 @@ When the main `Memory-Palace` repo is present, prefer these paths:
 1. State which object is being installed right now:
    - onboarding skill
    - canonical runtime skill
+   - when naming the target project, prefer the GitHub repo URL
+     `https://github.com/AGI-is-going-to-arrive/Memory-Palace`
+   - only switch to a local checkout path when the next command truly needs one
 2. Diagnose the user's host, goal, platform, and scope.
 3. Recommend the smallest correct path.
 4. Prefer one copyable command block per step.

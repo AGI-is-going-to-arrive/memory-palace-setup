@@ -3,6 +3,12 @@
 Use this file when the user is already following setup steps but the result
 still does not work.
 
+Target project repo:
+
+```text
+https://github.com/AGI-is-going-to-arrive/Memory-Palace
+```
+
 ## 1. The User Installed `memory-palace-setup`, But Not `memory-palace`
 
 Symptom:

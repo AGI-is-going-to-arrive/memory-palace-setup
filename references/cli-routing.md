@@ -3,6 +3,15 @@
 Use this file when the user wants to connect a CLI client to the
 `Memory-Palace` project.
 
+Target project repo:
+
+```text
+https://github.com/AGI-is-going-to-arrive/Memory-Palace
+```
+
+When talking to the user, name the GitHub repository first. Only switch to a
+local checkout path when the next command actually needs the local clone.
+
 Supported CLI clients:
 
 - `Claude Code`

@@ -2,6 +2,12 @@
 
 Use this file when the user needs a quick host-by-host routing decision.
 
+Target project repo:
+
+```text
+https://github.com/AGI-is-going-to-arrive/Memory-Palace
+```
+
 ## Object Distinction
 
 Always keep these separate:
@@ -69,8 +75,8 @@ Always keep these separate:
 - preferred automation:
 
 ```bash
-python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host cursor --repo /path/to/Memory-Palace
-python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host cursor --repo /path/to/Memory-Palace --check
+python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host cursor --repo /path/to/local/Memory-Palace-checkout
+python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host cursor --repo /path/to/local/Memory-Palace-checkout --check
 ```
 
 - fallback command:
@@ -100,8 +106,8 @@ python scripts/render_ide_host_config.py --host windsurf
 - preferred automation:
 
 ```bash
-python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host vscode --repo /path/to/Memory-Palace
-python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host vscode --repo /path/to/Memory-Palace --check
+python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host vscode --repo /path/to/local/Memory-Palace-checkout
+python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host vscode --repo /path/to/local/Memory-Palace-checkout --check
 ```
 
 - fallback render command:
@@ -121,8 +127,8 @@ python scripts/render_ide_host_config.py --host vscode
 - preferred automation:
 
 ```bash
-python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host antigravity --repo /path/to/Memory-Palace
-python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host antigravity --repo /path/to/Memory-Palace --check
+python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host antigravity --repo /path/to/local/Memory-Palace-checkout
+python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host antigravity --repo /path/to/local/Memory-Palace-checkout --check
 ```
 
 - fallback render command:

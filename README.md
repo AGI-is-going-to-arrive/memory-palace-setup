@@ -29,6 +29,7 @@ This is the easiest place to get confused:
   - its job is to guide installation and first-run troubleshooting
 - `memory-palace`
   - the canonical skill shipped by the main `Memory-Palace` repository
+  - target repo: `https://github.com/AGI-is-going-to-arrive/Memory-Palace`
   - its job is to drive normal day-to-day durable-memory workflows after setup
 
 One more distinction matters just as much:
@@ -184,16 +185,17 @@ cp /path/to/memory-palace-setup/variants/antigravity/global_workflows/memory-pal
   ~/.gemini/antigravity/global_workflows/
 ```
 
-If the main `Memory-Palace` repo is already cloned locally, the preferred
-automation path for `Cursor / Antigravity / VSCode-host` is:
+If the user has already cloned
+`https://github.com/AGI-is-going-to-arrive/Memory-Palace` locally, the
+preferred automation path for `Cursor / Antigravity / VSCode-host` is:
 
 ```bash
-python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host cursor --repo /path/to/Memory-Palace
-python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host antigravity --repo /path/to/Memory-Palace
-python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host vscode --repo /path/to/Memory-Palace
-python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host cursor --repo /path/to/Memory-Palace --check
-python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host antigravity --repo /path/to/Memory-Palace --check
-python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host vscode --repo /path/to/Memory-Palace --check
+python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host cursor --repo /path/to/local/Memory-Palace-checkout
+python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host antigravity --repo /path/to/local/Memory-Palace-checkout
+python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host vscode --repo /path/to/local/Memory-Palace-checkout
+python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host cursor --repo /path/to/local/Memory-Palace-checkout --check
+python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host antigravity --repo /path/to/local/Memory-Palace-checkout --check
+python /path/to/memory-palace-setup/scripts/apply_ide_mcp.py --host vscode --repo /path/to/local/Memory-Palace-checkout --check
 ```
 
 This script:
@@ -209,18 +211,20 @@ Once the onboarding skill is installed, say one of these:
 
 ```text
 Use $memory-palace-setup to install and configure Memory Palace step by step.
+Target repo: https://github.com/AGI-is-going-to-arrive/Memory-Palace
 Prefer skills + MCP over MCP-only. Start with Profile B, but recommend C/D if the environment is ready.
 ```
 
 ```text
 使用 $memory-palace-setup 帮我一步步安装配置 Memory Palace。
+目标仓库是 https://github.com/AGI-is-going-to-arrive/Memory-Palace
 优先走 skills + MCP，不要默认 MCP-only。先按 Profile B 起步，但如果环境允许，请主动推荐我升级到 C/D。
 ```
 
 If the onboarding skill is not installed yet, the fallback prompt is:
 
 ```text
-Please read this repository's README.md and SKILL.md first, then guide me step by step to install and configure Memory Palace. Prefer skills + MCP over MCP-only.
+Please read this repository's README.md and SKILL.md first, then guide me step by step to install and configure Memory Palace from https://github.com/AGI-is-going-to-arrive/Memory-Palace. Prefer skills + MCP over MCP-only.
 ```
 
 ## What The AI Should Do
